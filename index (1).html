@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muhammadi Traders</title>
+<style>
+:root{
+  --bg:#f4f6f4;
+  --panel:#ffffff;
+  --ink:#0d1f16;
+  --muted:#5b6b62;
+  --line:#dde5df;
+  --forest:#0e4b34;
+  --forest-deep:#093827;
+  --gold:#b6862c;
+  --gold-soft:#f4e6c8;
+  --danger:#a4342a;
+  --danger-soft:#f6e2df;
+  --ok-soft:#e1efe6;
+  --shadow:0 6px 18px rgba(13,31,22,.08);
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --bg:#0e1712;
+    --panel:#152019;
+    --ink:#eaf1ec;
+    --muted:#9db3a7;
+    --line:#243a2f;
+    --forest:#3a9c74;
+    --forest-deep:#2c7d5c;
+    --gold:#e0b355;
+    --gold-soft:#3a2f16;
+    --danger:#e2827a;
+    --danger-soft:#3a1f1c;
+    --ok-soft:#173026;
+    --shadow:0 6px 18px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1712;
+  --panel:#152019;
+  --ink:#eaf1ec;
+  --muted:#9db3a7;
+  --line:#243a2f;
+  --forest:#3a9c74;
+  --forest-deep:#2c7d5c;
+  --gold:#e0b355;
+  --gold-soft:#3a2f16;
+  --danger:#e2827a;
+  --danger-soft:#3a1f1c;
+  --ok-soft:#173026;
+  --shadow:0 6px 18px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Segoe UI',system-ui,Arial,sans-serif;
+  min-height:100vh;
+}
+a{color:var(--forest);}
+.wrap{max-width:1100px;margin:0 auto;padding:18px;}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 18px;background:var(--forest-deep);color:#fff;
+  border-radius:14px;margin-bottom:16px;flex-wrap:wrap;gap:10px;
+}
+.brand{font-size:19px;font-weight:800;letter-spacing:.3px;}
+.brand small{display:block;font-size:11px;font-weight:400;color:#c9e6d7;margin-top:2px;}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.tab{
+  padding:8px 14px;border-radius:9px;font-size:13px;font-weight:600;
+  color:#dff0e6;text-decoration:none;cursor:pointer;background:transparent;border:none;
+}
+.tab.active{background:var(--gold);color:#2a2005;}
+.panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:20px;margin-bottom:16px;box-shadow:var(--shadow);
+}
+.panel h2{margin:0 0 14px;font-size:16px;font-weight:800;}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;border-top:3px solid var(--forest);}
+.card .label{font-size:12px;color:var(--muted);}
+.card .num{font-size:22px;font-weight:800;margin-top:4px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+label{display:block;font-size:12px;font-weight:700;margin-bottom:5px;color:var(--muted);}
+input,select{
+  width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;
+  font-size:14px;background:var(--panel);color:var(--ink);margin-bottom:10px;
+}
+button{
+  border:none;border-radius:9px;padding:10px 16px;font-weight:700;font-size:13px;
+  cursor:pointer;
+}
+.btn-primary{background:var(--forest);color:#fff;}
+.btn-gold{background:var(--gold);color:#2a2005;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-ghost{background:var(--line);color:var(--ink);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;color:var(--muted);font-weight:700;padding:8px;border-bottom:2px solid var(--line);}
+td{padding:8px;border-bottom:1px solid var(--line);}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-pending{background:var(--gold-soft);color:var(--gold);}
+.badge-confirmed{background:var(--ok-soft);color:var(--forest);}
+.badge-dispatched{background:#dde8f6;color:#1d4ed8;}
+.badge-delivered{background:var(--ok-soft);color:var(--forest);}
+.badge-cancelled{background:var(--danger-soft);color:var(--danger);}
+.small{color:var(--muted);font-size:12px;}
+.linkbox{
+  display:flex;gap:8px;align-items:center;background:var(--bg);border:1px dashed var(--line);
+  padding:10px;border-radius:9px;font-size:12px;word-break:break-all;
+}
+.hide{display:none !important;}
+.orderline{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
+.qtybox{display:flex;align-items:center;gap:8px;}
+.qtybox button{width:32px;height:32px;padding:0;font-size:16px;}
+.qtybox input{width:56px;text-align:center;margin:0;padding:6px;}
+.toast{
+  position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+  background:var(--forest-deep);color:#fff;padding:12px 20px;border-radius:10px;
+  font-size:13px;box-shadow:var(--shadow);z-index:50;
+}
+.hero{
+  text-align:center;padding:40px 20px;background:var(--forest-deep);color:#fff;border-radius:16px;margin-bottom:16px;
+}
+.hero h1{margin:0 0 6px;font-size:24px;}
+.hero p{margin:0;color:#c9e6d7;font-size:14px;}
+@media(max-width:750px){.cards{grid-template-columns:repeat(2,1fr);}.grid2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app">Loading…</div>
+<div id="toastHost"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://dzvpckxgcabbutiamkae.supabase.co";
+const SUPABASE_KEY = "sb_publishable_soQt3u_KrBqXFvf4rYTCrQ_ZOu4Wcfn";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const app = document.getElementById("app");
+const params = new URLSearchParams(window.location.search);
+const OB_CODE = params.get("ob");
+
+function money(v){ return "Rs " + Number(v||0).toLocaleString(undefined,{maximumFractionDigits:0}); }
+function toast(msg){
+  const host = document.getElementById("toastHost");
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  host.appendChild(el);
+  setTimeout(()=>el.remove(), 3200);
+}
+function esc(s){ return (s||"").toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function badgeClass(status){
+  return {
+    "Pending":"badge-pending","Confirmed":"badge-confirmed","Processing":"badge-confirmed",
+    "Dispatched":"badge-dispatched","Delivered":"badge-delivered","Cancelled":"badge-cancelled","Rejected":"badge-cancelled"
+  }[status] || "badge-pending";
+}
+
+/* ============================================================
+   ORDER BOOKER VIEW  (?ob=OB-001)
+   ============================================================ */
+async function renderBookerView(){
+  const { data: booker } = await sb.from("order_bookers").select("*").eq("code", OB_CODE).maybeSingle();
+
+  if(!booker || !booker.active){
+    app.innerHTML = `<div class="panel"><h2>Link Invalid</h2><p class="small">Ye order booker link mojood nahi hai ya band kar diya gaya hai. Apne distributor se sahi link mangein.</p></div>`;
+    return;
+  }
+
+  const { data: products } = await sb.from("products").select("*").eq("active", true).order("brand");
+  const cart = {};
+
+  app.innerHTML = `
+    <div class="hero">
+      <h1>Welcome, ${esc(booker.shop_name || booker.name)}</h1>
+      <p>Order Booker: ${esc(booker.name)} &nbsp;•&nbsp; ID: ${esc(booker.code)}</p>
+    </div>
+    <div class="panel">
+      <h2>Products</h2>
+      <div id="catalog"></div>
+    </div>
+    <div class="panel">
+      <h2>Order Summary</h2>
+      <div id="cartBox" class="small">Cart khaali hai.</div>
+      <div style="margin-top:12px;"><strong id="grandTotal">Total: Rs 0</strong></div>
+      <button class="btn-primary" id="placeOrderBtn" style="margin-top:12px;width:100%;">Place Order</button>
+    </div>
+  `;
+
+  const catalog = document.getElementById("catalog");
+  if(!products || !products.length){
+    catalog.innerHTML = `<p class="small">Filhaal koi product available nahi.</p>`;
+  } else {
+    catalog.innerHTML = products.map(p => `
+      <div class="orderline">
+        <div>
+          <strong>${esc(p.brand)} — ${esc(p.name)}</strong><br>
+          <span class="small">${esc(p.size)} • ${money(p.sale_price)} • Stock: ${p.stock}</span>
+        </div>
+        <div class="qtybox">
+          <button type="button" data-act="minus" data-id="${p.id}">−</button>
+          <input type="number" min="0" max="${p.stock}" value="0" data-qty="${p.id}">
+          <button type="button" data-act="plus" data-id="${p.id}">+</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function updateCartUI(){
+    const box = document.getElementById("cartBox");
+    const items = Object.values(cart).filter(i => i.qty > 0);
+    if(!items.length){
+      box.innerHTML = `Cart khaali hai.`;
+      document.getElementById("grandTotal").textContent = "Total: Rs 0";
+      return;
+    }
+    let total = 0;
+    box.innerHTML = items.map(i => {
+      total += i.qty * i.price;
+      return `<div class="orderline"><span>${esc(i.label)} × ${i.qty}</span><strong>${money(i.qty*i.price)}</strong></div>`;
+    }).join("");
+    document.getElementById("grandTotal").textContent = "Total: " + money(total);
+  }
+
+  catalog?.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-act]");
+    if(!btn) return;
+    const id = btn.dataset.id;
+    const input = catalog.querySelector(`input[data-qty="${id}"]`);
+    let v = parseInt(input.value || "0", 10);
+    v = btn.dataset.act === "plus" ? v+1 : Math.max(0, v-1);
+    input.value = v;
+    input.dispatchEvent(new Event("input"));
+  });
+
+  catalog?.addEventListener("input", (e) => {
+    const input = e.target.closest("input[data-qty]");
+    if(!input) return;
+    const id = input.dataset.qty;
+    const p = products.find(x => String(x.id) === String(id));
+    let qty = parseInt(input.value || "0", 10);
+    if(isNaN(qty)) qty = 0;
+    qty = Math.max(0, Math.min(qty, p.stock));
+    cart[id] = { qty, price: p.sale_price, purchase_price: p.purchase_price, label: `${p.brand} - ${p.name} (${p.size})`, product_id: p.id, product_name: `${p.brand} - ${p.name} (${p.size})` };
+    updateCartUI();
+  });
+
+  catalog?.addEventListener("change", (e) => {
+    const input = e.target.closest("input[data-qty]");
+    if(!input) return;
+    const id = input.dataset.qty;
+    const p = products.find(x => String(x.id) === String(id));
+    const qty = Math.max(0, Math.min(parseInt(input.value||"0",10) || 0, p.stock));
+    input.value = qty;
+  });
+
+  document.getElementById("placeOrderBtn").addEventListener("click", async () => {
+    const items = Object.values(cart).filter(i => i.qty > 0);
+    if(!items.length){ toast("Pehle koi product quantity select karo."); return; }
+
+    const orderCode = "MT-ORD-" + Date.now();
+    const total = items.reduce((s,i)=> s + i.qty*i.price, 0);
+
+    const { data: orderRow, error: orderErr } = await sb.from("orders").insert({
+      order_code: orderCode,
+      booker_code: booker.code,
+      booker_name: booker.name,
+      shop_name: booker.shop_name,
+      status: "Pending",
+      subtotal: total,
+      total: total
+    }).select().single();
+
+    if(orderErr){ toast("Error: order save nahi hua."); return; }
+
+    const itemRows = items.map(i => ({
+      order_id: orderRow.id, product_id: i.product_id, product_name: i.product_name,
+      quantity: i.qty, unit_price: i.price, purchase_price: i.purchase_price, total: i.qty*i.price
+    }));
+    await sb.from("order_items").insert(itemRows);
+
+    for(const i of items){
+      const p = products.find(x => x.id === i.product_id);
+      await sb.from("products").update({ stock: p.stock - i.qty }).eq("id", i.product_id);
+    }
+
+    app.innerHTML = `
+      <div class="panel" style="text-align:center;">
+        <h2>✅ Order Submitted</h2>
+        <p>Order ID: <strong>${orderCode}</strong></p>
+        <p class="small">Aapka order distributor ko mil gaya hai. Status update hote hi pata chal jayega.</p>
+        <p style="font-size:22px;font-weight:800;margin-top:10px;">${money(total)}</p>
+      </div>
+    `;
+  });
+}
+
+/* ============================================================
+   ADMIN VIEW
+   ============================================================ */
+let currentTab = "dashboard";
+
+async function renderAdmin(){
+  app.innerHTML = `
+    <div class="topbar">
+      <div class="brand">MUHAMMADI TRADERS<small>Order Booker &amp; Distribution System</small></div>
+      <div class="tabs" id="tabs">
+        <button class="tab" data-tab="dashboard">Dashboard</button>
+        <button class="tab" data-tab="orders">Orders</button>
+        <button class="tab" data-tab="products">Products</button>
+        <button class="tab" data-tab="bookers">Order Bookers</button>
+        <button class="tab" data-tab="reports">Reports</button>
+      </div>
+    </div>
+    <div id="tabContent"></div>
+  `;
+  document.getElementById("tabs").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-tab]");
+    if(!b) return;
+    currentTab = b.dataset.tab;
+    paintTabs();
+    loadTab();
+  });
+  paintTabs();
+  await loadTab();
+
+  // Realtime: new order aane par turant notify + refresh if on orders/dashboard tab
+  sb.channel("orders-live")
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "orders" }, (payload) => {
+      toast("🔔 Naya order aaya: " + payload.new.order_code + " — " + money(payload.new.total));
+      if(currentTab === "orders" || currentTab === "dashboard") loadTab();
+    })
+    .subscribe();
+}
+
+function paintTabs(){
+  document.querySelectorAll("#tabs .tab").forEach(b => {
+    b.classList.toggle("active", b.dataset.tab === currentTab);
+  });
+}
+
+async function loadTab(){
+  const el = document.getElementById("tabContent");
+  el.innerHTML = `<p class="small">Loading…</p>`;
+  if(currentTab === "dashboard") return renderDashboard(el);
+  if(currentTab === "orders") return renderOrders(el);
+  if(currentTab === "products") return renderProducts(el);
+  if(currentTab === "bookers") return renderBookers(el);
+  if(currentTab === "reports") return renderReports(el);
+}
+
+async function renderDashboard(el){
+  const today = new Date().toISOString().slice(0,10);
+  const monthPrefix = today.slice(0,7);
+
+  const { data: orders } = await sb.from("orders").select("*");
+  const { data: items } = await sb.from("order_items").select("*");
+  const { data: products } = await sb.from("products").select("*").eq("active", true);
+
+  const todayOrders = orders.filter(o => o.created_at.slice(0,10) === today);
+  const pending = orders.filter(o => o.status === "Pending");
+  const monthOrders = orders.filter(o => o.created_at.slice(0,7) === monthPrefix && o.status !== "Cancelled");
+  const todaySales = todayOrders.filter(o=>o.status!=="Cancelled").reduce((s,o)=>s+Number(o.total),0);
+  const monthSales = monthOrders.reduce((s,o)=>s+Number(o.total),0);
+
+  const monthOrderIds = new Set(monthOrders.map(o=>o.id));
+  const monthProfit = items.filter(i => monthOrderIds.has(i.order_id))
+    .reduce((s,i)=> s + (i.unit_price - i.purchase_price) * i.quantity, 0);
+
+  const lowStock = products.filter(p => p.stock <= 5);
+
+  el.innerHTML = `
+    <div class="cards">
+      <div class="card"><div class="label">Today's Orders</div><div class="num">${todayOrders.length}</div></div>
+      <div class="card"><div class="label">Pending Orders</div><div class="num">${pending.length}</div></div>
+      <div class="card"><div class="label">Today's Sales</div><div class="num">${money(todaySales)}</div></div>
+      <div class="card"><div class="label">This Month's Sales</div><div class="num">${money(monthSales)}</div></div>
+    </div>
+    <div class="cards" style="grid-template-columns:repeat(2,1fr);">
+      <div class="card"><div class="label">This Month's Profit</div><div class="num">${money(monthProfit)}</div></div>
+      <div class="card"><div class="label">Low Stock Products</div><div class="num">${lowStock.length}</div></div>
+    </div>
+    <div class="panel">
+      <h2>⚠️ Low Stock</h2>
+      ${lowStock.length ? `<table><tr><th>Product</th><th>Stock</th></tr>${lowStock.map(p=>`<tr><td>${esc(p.brand)} - ${esc(p.name)} (${esc(p.size)})</td><td>${p.stock}</td></tr>`).join("")}</table>` : `<p class="small">Sab stock theek hai.</p>`}
+    </div>
+  `;
+}
+
+async function renderOrders(el){
+  const { data: orders } = await sb.from("orders").select("*").order("created_at", { ascending:false }).limit(60);
+  const { data: items } = await sb.from("order_items").select("*");
+
+  el.innerHTML = `
+    <div class="panel">
+      <h2>Orders (Real-time)</h2>
+      <table>
+        <tr><th>Order ID</th><th>Shop</th><th>Booker</th><th>Total</th><th>Status</th><th>Action</th></tr>
+        ${orders.map(o => {
+          const its = items.filter(i=>i.order_id===o.id).map(i=>`${esc(i.product_name)} x${i.quantity}`).join(", ");
+          return `
+          <tr>
+            <td>${esc(o.order_code)}<br><span class="small">${its}</span></td>
+            <td>${esc(o.shop_name)}</td>
+            <td>${esc(o.booker_name)}</td>
+            <td>${money(o.total)}</td>
+            <td><span class="badge ${badgeClass(o.status)}">${o.status}</span></td>
+            <td>
+              <select data-order="${o.id}" class="statusSel" style="margin-bottom:0;">
+                ${["Pending","Confirmed","Processing","Dispatched","Delivered","Cancelled"].map(s=>`<option value="${s}" ${s===o.status?"selected":""}>${s}</option>`).join("")}
+              </select>
+            </td>
+          </tr>`;
+        }).join("")}
+      </table>
+    </div>
+  `;
+
+  el.querySelectorAll(".statusSel").forEach(sel => {
+    sel.addEventListener("change", async () => {
+      await sb.from("orders").update({ status: sel.value }).eq("id", sel.dataset.order);
+      toast("Order status update ho gaya.");
+    });
+  });
+}
+
+async function renderProducts(el){
+  const { data: products } = await sb.from("products").select("*").order("brand");
+
+  el.innerHTML = `
+    <div class="panel">
+      <h2>Add Product</h2>
+      <form id="prodForm">
+        <div class="grid2">
+          <div><label>Brand</label><input name="brand" required></div>
+          <div><label>Name</label><input name="name" required></div>
+          <div><label>Size</label><input name="size" required></div>
+          <div><label>Purchase Price</label><input name="purchase_price" type="number" step="0.01" required></div>
+          <div><label>Sale Price</label><input name="sale_price" type="number" step="0.01" required></div>
+          <div><label>Opening Stock</label><input name="stock" type="number" required></div>
+        </div>
+        <button class="btn-primary" type="submit">Add Product</button>
+      </form>
+    </div>
+    <div class="panel">
+      <h2>All Products</h2>
+      <table>
+        <tr><th>Brand</th><th>Name</th><th>Size</th><th>Sale Price</th><th>Stock</th><th>Action</th></tr>
+        ${products.map(p => `
+          <tr>
+            <td>${esc(p.brand)}</td><td>${esc(p.name)}</td><td>${esc(p.size)}</td>
+            <td>${money(p.sale_price)}</td>
+            <td><input type="number" data-stockid="${p.id}" value="${p.stock}" style="width:80px;margin:0;"></td>
+            <td><button class="btn-danger" data-del="${p.id}">Delete</button></td>
+          </tr>
+        `).join("")}
+      </table>
+    </div>
+  `;
+
+  document.getElementById("prodForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    await sb.from("products").insert({
+      brand: f.get("brand"), name: f.get("name"), size: f.get("size"),
+      purchase_price: parseFloat(f.get("purchase_price")), sale_price: parseFloat(f.get("sale_price")),
+      stock: parseInt(f.get("stock"))
+    });
+    toast("Product add ho gaya.");
+    renderProducts(el);
+  });
+
+  el.querySelectorAll("input[data-stockid]").forEach(inp => {
+    inp.addEventListener("change", async () => {
+      await sb.from("products").update({ stock: parseInt(inp.value) }).eq("id", inp.dataset.stockid);
+      toast("Stock update ho gaya.");
+    });
+  });
+
+  el.querySelectorAll("button[data-del]").forEach(b => {
+    b.addEventListener("click", async () => {
+      if(!confirm("Delete karna hai?")) return;
+      await sb.from("products").update({ active: false }).eq("id", b.dataset.del);
+      renderProducts(el);
+    });
+  });
+}
+
+async function renderBookers(el){
+  const { data: bookers } = await sb.from("order_bookers").select("*").order("code");
+  const baseUrl = window.location.origin + window.location.pathname;
+
+  el.innerHTML = `
+    <div class="panel">
+      <h2>Add Order Booker</h2>
+      <form id="obForm">
+        <div class="grid2">
+          <div><label>Code (e.g. OB-001)</label><input name="code" required></div>
+          <div><label>Name</label><input name="name" required></div>
+          <div><label>Phone</label><input name="phone"></div>
+          <div><label>Shop Name</label><input name="shop_name"></div>
+          <div><label>Area</label><input name="area"></div>
+        </div>
+        <button class="btn-primary" type="submit">Add Order Booker</button>
+      </form>
+    </div>
+    <div class="panel">
+      <h2>All Order Bookers</h2>
+      ${bookers.map(b => `
+        <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--line);">
+          <strong>${esc(b.name)}</strong> (${esc(b.code)}) — ${esc(b.shop_name||"")} <span class="small">${esc(b.area||"")}</span>
+          <div class="linkbox" style="margin-top:8px;">
+            <span>${baseUrl}?ob=${esc(b.code)}</span>
+            <button class="btn-ghost" data-copy="${baseUrl}?ob=${esc(b.code)}" style="flex-shrink:0;">Copy Link</button>
+          </div>
+        </div>
+      `).join("") || "<p class='small'>Koi order booker abhi add nahi hua.</p>"}
+    </div>
+  `;
+
+  document.getElementById("obForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const { error } = await sb.from("order_bookers").insert({
+      code: f.get("code"), name: f.get("name"), phone: f.get("phone"),
+      shop_name: f.get("shop_name"), area: f.get("area")
+    });
+    if(error){ toast("Error: ye code pehle se mojood hai."); return; }
+    toast("Order Booker add ho gaya.");
+    renderBookers(el);
+  });
+
+  el.querySelectorAll("button[data-copy]").forEach(b => {
+    b.addEventListener("click", () => {
+      navigator.clipboard.writeText(b.dataset.copy);
+      toast("Link copy ho gaya.");
+    });
+  });
+}
+
+async function renderReports(el){
+  const { data: orders } = await sb.from("orders").select("*").neq("status","Cancelled");
+  const { data: items } = await sb.from("order_items").select("*");
+
+  const byMonth = {};
+  orders.forEach(o => {
+    const m = o.created_at.slice(0,7);
+    byMonth[m] = byMonth[m] || { sales:0, orders:0 };
+    byMonth[m].sales += Number(o.total);
+    byMonth[m].orders += 1;
+  });
+
+  const orderIdToMonth = {};
+  orders.forEach(o => orderIdToMonth[o.id] = o.created_at.slice(0,7));
+  const profitByMonth = {};
+  items.forEach(i => {
+    const m = orderIdToMonth[i.order_id];
+    if(!m) return;
+    profitByMonth[m] = (profitByMonth[m]||0) + (i.unit_price - i.purchase_price) * i.quantity;
+  });
+
+  const months = Object.keys(byMonth).sort().reverse();
+
+  el.innerHTML = `
+    <div class="panel">
+      <h2>Monthly Report</h2>
+      <table>
+        <tr><th>Month</th><th>Orders</th><th>Sales</th><th>Profit</th></tr>
+        ${months.map(m => `<tr><td>${m}</td><td>${byMonth[m].orders}</td><td>${money(byMonth[m].sales)}</td><td>${money(profitByMonth[m]||0)}</td></tr>`).join("") || "<tr><td colspan='4' class='small'>Data nahi.</td></tr>"}
+      </table>
+    </div>
+  `;
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+if(OB_CODE){
+  renderBookerView();
+} else {
+  renderAdmin();
+}
+</script>
+</body>
+</html>
